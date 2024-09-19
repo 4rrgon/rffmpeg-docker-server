@@ -1,0 +1,28 @@
+FROM debian:bookworm
+
+RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib non-free" > /etc/apt/sources.list; \
+    echo "deb-src http://deb.debian.org/debian/ bookworm main contrib non-free" >> /etc/apt/sources.list; \
+    apt update; \
+    mkdir /var/run/sshd; \
+    apt install -y openssh-server intel-media-va-driver-non-free wget tzdata; \
+    sed -i 's/^#\(PermitRootLogin\) .*/\1 yes/' /etc/ssh/sshd_config; \
+    sed -i 's/^\(UsePAM yes\)/# \1/' /etc/ssh/sshd_config; \
+    wget -O /tmp/jellyfin-ffmpeg.deb https://repo.jellyfin.org/files/ffmpeg/debian/latest-7.x/amd64/jellyfin-ffmpeg7_7.0.2-1-bookworm_amd64.deb; \
+    apt install -y /tmp/jellyfin-ffmpeg.deb; \
+    rm -rf /tmp/jellyfin-ffmpeg.deb; \
+    apt purge wget -y; \
+    apt autoremove --purge -y; \
+    apt clean;
+
+RUN { \
+    echo '#!/bin/bash -eu'; \
+    echo 'ln -fs /usr/share/zoneinfo/${TZ} /etc/localtime'; \
+    echo 'echo "root:${ROOT_PASSWORD}" | chpasswd'; \
+    echo 'exec "$@"'; \
+    } > /usr/local/bin/entrypoint.sh; \
+    chmod +x /usr/local/bin/entrypoint.sh;
+
+EXPOSE 22
+
+ENTRYPOINT ["entrypoint.sh"]
+CMD    ["/usr/sbin/sshd", "-D", "-e"]

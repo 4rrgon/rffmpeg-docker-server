@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  ffmpeg-server:
+    image: rffmpeg-client
+    ports:
+      - "9000:8096"
+    group_add:
+      - "105"
+    restart: unless-stopped
+    environment:
+      - TZ=America/New_York
+    volumes:
+      - ./config:/config
+      - ./cache:/cache
+      - /mnt/transcodes:/config/transcodes
+      - /media/server/Media:/media
+      - ./ssh:/root/.ssh
+      - ./ssh-hosts:/etc/ssh
+      - ./rffmpeg:/etc/rffmpeg

@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  ffmpeg-server:
+    image: rffmpeg-server-intel:latest
+    ports:
+      - "23:22"
+    group_add:
+      - "105"
+    restart: unless-stopped
+    environment:
+      - TZ=America/New_York
+      - ROOT_PASSWORD=password
+    volumes:
+      - /mnt/transcodes:/config/transcodes
+      - ./ssh:/root/.ssh
+      - ./ssh-hosts:/etc/ssh
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
