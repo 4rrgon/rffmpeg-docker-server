@@ -4,9 +4,9 @@ services:
   ffmpeg-server:
     image: rffmpeg-server-intel:latest
     ports:
-      - "23:22"
+      - "23:23"
     group_add:
-      - "105"
+      - "105" #Replace with render group id
     restart: unless-stopped
     environment:
       - TZ=America/New_York
