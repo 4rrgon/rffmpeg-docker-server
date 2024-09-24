@@ -1,15 +1,20 @@
 FROM jellyfin/jellyfin:latest
 
 RUN apt update; \
-    apt install -y openssh-client python3-click python3-yaml wget;\
+    apt install -y openssh-client python3-click python3-yaml wget; \
+    apt purge -y jellyfin-ffmpeg6 jellyfin-ffmpeg7; \
     wget -O /usr/local/bin/rffmpeg https://raw.githubusercontent.com/joshuaboniface/rffmpeg/master/rffmpeg; \
     chmod +x /usr/local/bin/rffmpeg; \
+    mkdir -p /usr/lib/jellyfin-ffmpeg; \
     ln -s /usr/local/bin/rffmpeg /usr/local/bin/ffmpeg; \
     ln -s /usr/local/bin/rffmpeg /usr/local/bin/ffprobe; \
+    ln -s /usr/local/bin/rffmpeg /usr/lib/jellyfin-ffmpeg/ffmpeg; \
+    ln -s /usr/local/bin/rffmpeg /usr/lib/jellyfin-ffmpeg/ffprobe; \
     mkdir -p /etc/rffmpeg; \
+    rffmpeg init -y; \
     apt purge wget -y; \
     rm -rf /var/lib/apt/lists/*; \
     apt autoremove --purge -y; \
-    apt clean
+    apt clean;
 
 ENTRYPOINT "./jellyfin/jellyfin"
